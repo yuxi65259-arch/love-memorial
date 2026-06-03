@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import Layout from '@/components/layout/Layout'
 import HomePage from '@/pages/HomePage'
 import TimelinePage from '@/pages/TimelinePage'
@@ -12,7 +12,7 @@ import SecretPage from '@/pages/SecretPage'
 
 export default function App() {
   return (
-    <BrowserRouter basename="/love-memorial">
+    <HashRouter>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
@@ -26,6 +26,6 @@ export default function App() {
           <Route path="secret" element={<SecretPage />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
