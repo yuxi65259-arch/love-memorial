@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import Modal from '@/components/ui/Modal'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Calendar, Heart } from 'lucide-react'
@@ -41,6 +41,7 @@ export default function TimelinePage() {
   const [selected, setSelected] = useState<Milestone | null>(null)
 
   useEffect(() => {
+    if (!isSupabaseConfigured) { setLoading(false); return }
     supabase
       .from('milestones')
       .select('*')

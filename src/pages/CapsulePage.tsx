@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import Modal from '@/components/ui/Modal'
 import { Timer, Lock, Unlock, Plus, Calendar, Eye } from 'lucide-react'
@@ -24,6 +24,7 @@ export default function CapsulePage() {
   const [form, setForm] = useState({ author: '', title: '', message: '', unlock_at: '' })
 
   const fetchCapsules = () => {
+    if (!isSupabaseConfigured) { setLoading(false); return }
     supabase
       .from('time_capsules')
       .select('*')
@@ -44,6 +45,7 @@ export default function CapsulePage() {
 
   const createCapsule = async () => {
     if (!form.title || !form.message || !form.unlock_at || !form.author) return
+    if (!isSupabaseConfigured) { setForm({ author: '', title: '', message: '', unlock_at: '' }); setShowForm(false); return }
     await supabase.from('time_capsules').insert({
       author: form.author,
       title: form.title,
@@ -57,7 +59,9 @@ export default function CapsulePage() {
 
   const viewCapsule = async (capsule: Capsule) => {
     if (!capsule.is_unlocked) {
-      await supabase.from('time_capsules').update({ is_unlocked: true }).eq('id', capsule.id)
+      if (isSupabaseConfigured) {
+        await supabase.from('time_capsules').update({ is_unlocked: true }).eq('id', capsule.id)
+      }
     }
     setSelected(capsule)
   }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import PasswordGate from '@/components/ui/PasswordGate'
 import { Heart, Camera, Lock } from 'lucide-react'
 
@@ -16,7 +16,7 @@ export default function SecretPage() {
   }, [])
 
   useEffect(() => {
-    if (authenticated) {
+    if (authenticated && isSupabaseConfigured) {
       supabase
         .from('settings')
         .select('value')

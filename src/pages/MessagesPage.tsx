@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Send, ImageIcon, Mic, Heart, Lock, Clock } from 'lucide-react'
 
@@ -24,6 +24,7 @@ export default function MessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const fetchMessages = () => {
+    if (!isSupabaseConfigured) { setLoading(false); return }
     supabase
       .from('messages')
       .select('*')
@@ -37,6 +38,7 @@ export default function MessagesPage() {
   useEffect(() => {
     fetchMessages()
 
+    if (!isSupabaseConfigured) return
     const channel = supabase
       .channel('messages')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
@@ -53,6 +55,7 @@ export default function MessagesPage() {
 
   const handleSend = async () => {
     if (!content.trim() || !author.trim()) return
+    if (!isSupabaseConfigured) { setContent(''); return }
     await supabase.from('messages').insert({ author, content: content.trim(), is_love_letter: activeTab === 'letters' })
     setContent('')
     fetchMessages()

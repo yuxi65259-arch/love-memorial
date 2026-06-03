@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Award, Check, Flame, Star, Heart, Coffee, Utensils, Music, Film, Plane, Sun, Moon } from 'lucide-react'
 
@@ -40,6 +40,7 @@ export default function CheckInPage() {
   const [completedAnim, setCompletedAnim] = useState<string | null>(null)
 
   const fetchCheckins = () => {
+    if (!isSupabaseConfigured) { setLoading(false); return }
     supabase
       .from('checkins')
       .select('*')
@@ -53,6 +54,7 @@ export default function CheckInPage() {
   useEffect(() => { fetchCheckins() }, [])
 
   const doCheckIn = async (task: typeof presetTasks[0]) => {
+    if (!isSupabaseConfigured) { setCompletedAnim(task.title); setTimeout(() => setCompletedAnim(null), 2000); return }
     const badge = badgeColors[Math.floor(Math.random() * badgeColors.length)]
     await supabase.from('checkins').insert({
       task_title: task.title,

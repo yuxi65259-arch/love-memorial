@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Check, Plus, Star, X } from 'lucide-react'
 
@@ -22,6 +22,7 @@ export default function WishesPage() {
   const [newDesc, setNewDesc] = useState('')
 
   const fetchWishes = () => {
+    if (!isSupabaseConfigured) { setLoading(false); return }
     supabase
       .from('wishes')
       .select('*')
@@ -35,6 +36,7 @@ export default function WishesPage() {
   useEffect(() => { fetchWishes() }, [])
 
   const toggleWish = async (id: string, current: boolean) => {
+    if (!isSupabaseConfigured) return
     await supabase
       .from('wishes')
       .update({ is_completed: !current, completed_date: !current ? new Date().toISOString() : null })
@@ -44,6 +46,7 @@ export default function WishesPage() {
 
   const addWish = async () => {
     if (!newTitle.trim()) return
+    if (!isSupabaseConfigured) { setNewTitle(''); setNewDesc(''); setShowForm(false); return }
     await supabase.from('wishes').insert({ title: newTitle.trim(), description: newDesc.trim() })
     setNewTitle('')
     setNewDesc('')

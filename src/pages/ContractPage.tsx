@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { FileSignature, Pen, Check, User } from 'lucide-react'
 
@@ -36,6 +36,7 @@ export default function ContractPage() {
   const [isDrawing, setIsDrawing] = useState(false)
 
   useEffect(() => {
+    if (!isSupabaseConfigured) { setLoading(false); return }
     supabase
       .from('love_contracts')
       .select('*')
@@ -97,10 +98,14 @@ export default function ContractPage() {
     const dataUrl = canvas.toDataURL()
     const field = signPartner === 'partner1' ? 'signature1' : 'signature2'
     const signedField = signPartner === 'partner1' ? 'signed_by_partner1' : 'signed_by_partner2'
-    await supabase.from('love_contracts').update({ [field]: dataUrl, [signedField]: true }).eq('id', contractId)
+    if (isSupabaseConfigured) {
+      await supabase.from('love_contracts').update({ [field]: dataUrl, [signedField]: true }).eq('id', contractId)
+    }
     setSigning(null)
-    const { data } = await supabase.from('love_contracts').select('*').order('created_at', { ascending: false })
-    if (data) setContracts(data as Contract[])
+    if (isSupabaseConfigured) {
+      const { data } = await supabase.from('love_contracts').select('*').order('created_at', { ascending: false })
+      if (data) setContracts(data as Contract[])
+    }
   }
 
   if (loading) return <LoadingSpinner />
