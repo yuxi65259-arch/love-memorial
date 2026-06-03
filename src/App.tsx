@@ -12,7 +12,7 @@ import SecretPage from '@/pages/SecretPage'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/love-memorial">
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
